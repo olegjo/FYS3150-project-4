@@ -1,6 +1,11 @@
-#include <armadillo>
-using namespace arma;
 
-double energy(mat S, int pos_x, int pos_y);
 
-int periodic(int index, int size);
+int periodic(int index, int size, int add);
+
+int randint(int a, int b, long& idum);
+// returns a random integer in the interval [a, b]
+
+
+void Metropolis(int** S, double &E, double &M, double *w, int L, long &idum);
+
+void Initialize_uniform(double **S, double &E, double &M, int L);

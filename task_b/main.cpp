@@ -1,64 +1,110 @@
 #include <iostream>
 #include "../lib.h"
-#include <armadillo>
 #include <cmath>
 #include "../isingmodel.h"
-
+#include <iomanip>
+#include <fstream>
 using namespace std;
-using namespace arma;
 
-int main()
+int main(int argc, char* argv[])
 {
+    double T = atof(argv[1]); // Temperature
+    double E, M;
 
-    double L = 3;
-    long idum = -1;
+    int L = atoi(argv[2]);
+    int MCcycles = atoi(argv[3]);
+    long idum = -1; // starting point for the RNG
 
-    // initialize lattice
-    mat S = zeros<mat>(L+2,L+2);
-    for (int i = 1; i < L+1; i++) {
-        for (int j = 1; j < L+1; j++) {
-            S(i, j) = round(ran0(&idum))*2-1; // creating random 1's or -1's
+    double average[5];
+
+    // pre-calculating the possible changes in energy
+    double w[17];
+    for (int deltaE = -8; deltaE <= 8; deltaE++) {
+        w[deltaE+8] = 0;
+    }
+    for (int deltaE = -8; deltaE <= 8; deltaE+=4) {
+        w[deltaE+8] = exp(-deltaE/T);
+    }
+    for (int i = 0; i < 5; i++) average[i] = 0.0;
+
+    // initialize lattice, and energy and magnetization for ground state
+    int **S;
+    for (int i=0; i<L; i++) {
+        S = new int *[L];
+    }
+    for (int i=0; i<L; i++) {
+        S[i] = new int [L];
+    }
+    E = M = 0.0;
+    for (int i = 0; i < L; i++) {
+        for (int j = 0; j < L; j++) {
+            S[i][j] = 1;
+            M += (double) S[i][j];
         }
     }
-    // Periodic boundary conditions
-    for (int i = 1; i < L+1; i++) {
-        S(i, 0) = S(i, L);
-        S(0, i) = S(L, i);
-        S(i, L+1) = S(i, 1);
-        S(L+1, i) = S(1, i);
+    for (int y = 0; y < L; y++) {
+        for (int x = 0; x < L; x++) {
+            E -= (double) S[y][x]*
+                    (S[periodic(y,L,-1)][x] +
+                    S[y][periodic(x, L, -1)]);
+        }
     }
 
-    // Choose two random numbers in [1, L]. This is where I position myself in the lattice
-    int pos_x = floor(ran0(&idum)*L + 1);
-    int pos_y = floor(ran0(&idum)*L + 1);
-    cout << pos_x << " " << pos_y << endl;
-    // calculate the energy of this position
-    double E = energy(S, pos_x, pos_y);
-    cout << E << endl;
-    cout << S << endl;
-    // now change one of five spins - current, left, right, over, below
-    int change = floor(ran0(&idum)*6);
-    if (change == 0) {
-        S(pos_y, pos_x) *= -1;
+    for (int cycles=1; cycles<=MCcycles; cycles++) {
+        Metropolis(S, E, M, w, L, idum);
+        // update expectation values
+        average[0] += E;    average[1] += E*E;
+        average[2] += M;    average[3] += M*M;  average[4] += fabs(M);
     }
-    if (change == 1) {
-        S(pos_y, pos_x+1) *= -1;
-    }
-    if (change == 2) {
-        S(pos_y+1, pos_x) *= -1;
-    }
-    if (change == 3) {
-        S(pos_y, pos_x-1) *= -1;
-    }
-    if (change == 4) {
-        S(pos_y-1, pos_x) *= -1;
-    }
-    cout << energy(S, pos_x, pos_y) << endl;
-    cout << S << endl;
 
-    // calculate energy of this new state
-    //
 
+
+
+    double norm = 1/((double) (MCcycles));  // divided by total number of cycles
+    double Eaverage = average[0]*norm;
+    double E2average = average[1]*norm;
+    double Maverage = average[2]*norm;
+    double M2average = average[3]*norm;
+    double Mabsaverage = average[4]*norm;
+    // all expectation values are per spin, divide by 1/L/L
+    double Evariance = (E2average- Eaverage*Eaverage)/L/L;
+    double Mvariance = (M2average - Mabsaverage*Mabsaverage)/L/L;
+
+    char *outfilename = argv[4];
+    ofstream outfile(outfilename);
+
+    outfile << setprecision(8) << MCcycles;
+    outfile << setw(15) << setprecision(8) << T;
+    outfile << setw(15) << setprecision(8) << Eaverage/L/L;
+    outfile << setw(15) << setprecision(8) << Evariance/T/T; // divide by T**2 because specific heat
+    outfile << setw(15) << setprecision(8) << Maverage/L/L;
+    outfile << setw(15) << setprecision(8) << Mvariance/T;    // divide by T because suceptibility
+    outfile << setw(15) << setprecision(8) << Mabsaverage/L/L << endl;
+    outfile.close();
+
+
+    //cout << Eaverage/L/L << endl;
+
+    delete[] S;
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
