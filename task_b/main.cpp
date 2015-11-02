@@ -10,6 +10,8 @@ int main(int argc, char* argv[])
 {
     double T = atof(argv[1]); // Temperature
     double E, M;
+    int accepted = 0;
+    char *initial_state;
 
     int L = atoi(argv[2]);
     int MCcycles = atoi(argv[3]);
@@ -38,7 +40,8 @@ int main(int argc, char* argv[])
     E = M = 0.0;
     for (int i = 0; i < L; i++) {
         for (int j = 0; j < L; j++) {
-            S[i][j] = 1;
+            S[i][j] = round(ran1(&idum))*2-1;   initial_state = "Random";
+//            S[i][j] = 1;                        initial_state = "Uniform";
             M += (double) S[i][j];
         }
     }
@@ -51,7 +54,7 @@ int main(int argc, char* argv[])
     }
 
     for (int cycles=1; cycles<=MCcycles; cycles++) {
-        Metropolis(S, E, M, w, L, idum);
+        Metropolis(S, E, M, w, L, idum, accepted);
         // update expectation values
         average[0] += E;    average[1] += E*E;
         average[2] += M;    average[3] += M*M;  average[4] += fabs(M);
@@ -71,15 +74,20 @@ int main(int argc, char* argv[])
     double Mvariance = (M2average - Mabsaverage*Mabsaverage)/L/L;
 
     char *outfilename = argv[4];
-    ofstream outfile(outfilename);
+    ofstream outfile;
+    outfile.open(outfilename, ios::out);
 
+    outfile << "# Contents: " << endl;
+    outfile << "# Columns: MCcycles  -  T  -  Eaverage/part.  -  C_V  -  M/part  -  Xsi  -  abs(M)_average/part  -  N_accepted" << endl;
+    outfile << "# Initial state = " << initial_state << endl;
     outfile << setprecision(8) << MCcycles;
     outfile << setw(15) << setprecision(8) << T;
     outfile << setw(15) << setprecision(8) << Eaverage/L/L;
     outfile << setw(15) << setprecision(8) << Evariance/T/T; // divide by T**2 because specific heat
     outfile << setw(15) << setprecision(8) << Maverage/L/L;
     outfile << setw(15) << setprecision(8) << Mvariance/T;    // divide by T because suceptibility
-    outfile << setw(15) << setprecision(8) << Mabsaverage/L/L << endl;
+    outfile << setw(15) << setprecision(8) << Mabsaverage/L/L;
+    outfile << setw(15) << setprecision(8) << accepted << endl;
     outfile.close();
 
 

@@ -15,7 +15,7 @@ int randint(int a, int b, long &idum)
     return floor(ran0(&idum)*(b+1-a) + a);
 }
 
-void Metropolis(int **S, double &E, double &M, double *w, int L, long &idum)
+void Metropolis(int **S, double &E, double &M, double *w, int L, long &idum, int &accepted)
 {
     // loop over all the elements in the lattice
     for (int y=0; y < L; y++) {
@@ -32,6 +32,7 @@ void Metropolis(int **S, double &E, double &M, double *w, int L, long &idum)
             // if deltaE <= 0 accept the new configuration, if not, check if a random number <= exp(deltaE/T) and accept
             if (ran1(&idum) <= w[deltaE+8] ) {
                 S[iy][ix] *= -1;
+                accepted += 1;
                 E += (double) deltaE;
                 M += (double) 2*S[iy][ix];
             }

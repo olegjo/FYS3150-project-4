@@ -6,6 +6,6 @@ int randint(int a, int b, long& idum);
 // returns a random integer in the interval [a, b]
 
 
-void Metropolis(int** S, double &E, double &M, double *w, int L, long &idum);
+void Metropolis(int** S, double &E, double &M, double *w, int L, long &idum, int &accepted);
 
 void Initialize_uniform(double **S, double &E, double &M, int L);
