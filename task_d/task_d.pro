@@ -4,11 +4,11 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-	   ../isingmodel.cpp \
-    unittests.cpp
+	../lib.cpp \
+	../isingmodel.cpp
 
-HEADERS += ../isingmodel.h \
-    unittests.h
-
+HEADERS += ../lib.h \
+	   ../isingmodel.h
 
 INCLUDEPATH += /usr/local/include
+

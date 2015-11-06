@@ -59,3 +59,16 @@ void Initialize_uniform(double **S, double &E, double &M, int L)
         }
     }
 }
+
+double calc_total_energy(int **S, int L)
+{
+    double E = 0;
+    for (int y = 0; y < L; y++) {
+        for (int x = 0; x < L; x++) {
+            E -= (double) S[y][x]*
+                    (S[periodic(y,L,-1)][x] +
+                    S[y][periodic(x, L, -1)]);
+        }
+    }
+    return E;
+}

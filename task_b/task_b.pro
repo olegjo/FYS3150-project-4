@@ -11,4 +11,4 @@ HEADERS += ../lib.h \
 	   ../isingmodel.h
 
 INCLUDEPATH += /usr/local/include
-#LIBS += -larmadillo -lblas -llapack
+
