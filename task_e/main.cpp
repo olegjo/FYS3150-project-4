@@ -11,14 +11,14 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-
+    double  time_start, time_end, total_time;
 
     // initialize MPI
     int numprocs, my_rank;
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-
+    time_start = MPI_Wtime();
     if (argc < 8) {
         if(my_rank == 0) {
             cout << "Bad usage. Command line arguments:" << endl;
@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
     if (my_rank == 0) {
         outfile.open(outfilename, ios::out);
         outfile << "# Initial state: " << initial_state << endl;
-        outfile << "# MCcycles  -  <E>  -  E" << endl;
+        outfile << "# MCcycles  -  sigma_E^2  -  sigma_M^2  -  C_V  -  Xsi" << endl;
     }
-
-    double E, M, w[17], average[5], total_average[5];
+    int n_averages = 4;
+    double E, M, w[17], average[n_averages], total_average[n_averages];
     // initialize lattice. First allocating memory.
     int **S;
     for (int i=0; i<L; i++) {
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
     long idum = -1-my_rank; // starting point for the RNG
 
-    for (double T = T_initial; T < T_final; T+=T_step) {
+    for (double T = T_initial; T <= T_final; T+=T_step) {
 
         // initializing the lattice with random or uniform spin configuration
         initialize(S, E, M, L, idum, initial_state);
@@ -88,39 +88,50 @@ int main(int argc, char* argv[])
             w[deltaE+8] = exp(-deltaE/T);
         }
 
-        for (int i = 0; i < 5; i++) average[i] = 0.0;
-        for (int i = 0; i < 5; i++) total_average[i] = 0.0;
+        for (int i = 0; i < n_averages; i++) average[i] = 0.0;
+        for (int i = 0; i < n_averages; i++) total_average[i] = 0.0;
 
         int accepted = 0; // number of accepted energy states
         for (int cycles = myloop_begin; cycles <= myloop_end; cycles++) {
             Metropolis(S, E, M, w, L, idum, accepted);
             // update expectation values
             average[0] += E;    average[1] += E*E;
-            average[2] += M;    average[3] += M*M;  average[4] += fabs(M);
+            average[2] += fabs(M); average[3] += fabs(M)*fabs(M);
         }
 
         // find total average
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < n_averages; i++) {
             MPI_Reduce(&average[i], &total_average[i], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
 
-        outfile << setw(8) << setprecision(15) << T;
-        outfile << setw(8) << setprecision(15) << L << endl;
+
+        double norm = 1/((double) (MCcycles));  // divided by total number of cycles
+        double E_average = total_average[0]*norm;
+        double E2_average = total_average[1]*norm;
+        double M_abs_average = total_average[2]*norm;
+        double M_abs2_average = total_average[3]*norm;
+        // all expectation values are per spin, divide by L*L
+        double E_variance = (E2_average- E_average*E_average)/L/L;
+        double M_abs_variance = (M_abs2_average - M_abs_average*M_abs_average)/L/L;
+
+        outfile << setw(15) << setprecision(8) << T;
+        outfile << setw(15) << setprecision(8) << E_variance;
+        outfile << setw(15) << setprecision(8) << M_abs_variance;
+        outfile << setw(15) << setprecision(8) << E_variance/T/T; // Divide by T*T because heat capacity
+        outfile << setw(15) << setprecision(8) << M_abs_variance/T << endl; // Divide by T because susceptibility
     }
+    time_end = MPI_Wtime();
+    total_time = time_end-time_start;
 
-
+    if (my_rank == 0) {
+        cout << "Time: " << total_time << " on " << numprocs << " processors" << endl;
+    }
 
     delete[] S;
     outfile.close();
     MPI_Finalize();
     return 0;
 }
-
-
-
-
-
-
 
 
 

@@ -12,18 +12,14 @@ int main(int argc, char* argv[])
 {
     if (argc < 6) {
         cout << "Bad usage. Command line arguments:" << endl;
-        cout << "T, L, critical variance, MCcylces, outfilename, initial state (Random or Uniform)" << endl << endl;
-        cout << "Critical variance is the variance that below which, the system is considered" << endl;
-        cout << "           stable and we start recording the total energy of the system." << endl;
-        cout << "           sigma_E = 0.5 and sigma_E = 8.5 are found to be useful for T=1 and T=2." << endl;
+        cout << "T, L, MCcylces, outfilename, initial state (Random or Uniform)" << endl << endl;
     }
 
     double T = atof(argv[1]); // Temperature
     int L = atoi(argv[2]);
-    float sigma_E_crit = atof(argv[3]);
-    int MCcycles = atoi(argv[4]);
-    string outfilename = argv[5];
-    string initial_state = argv[6];
+    int MCcycles = atoi(argv[3]);
+    string outfilename = argv[4];
+    string initial_state = argv[5];
 
     long idum = -1; // starting point for the RNG
     double E, M;
@@ -47,6 +43,7 @@ int main(int argc, char* argv[])
     for (int i=0; i<L; i++) {
         S[i] = new int [L];
     }
+    // initializing the lattice with random or uniform spin configuration
     initialize(S, E, M, L, idum, initial_state);
 
 
@@ -58,23 +55,21 @@ int main(int argc, char* argv[])
 
 
     for (int i = 0; i < 5; i++) average[i] = 0.0;
-    // initializing the lattice with random or uniform spin configuration
 
     E = calc_total_energy(S, L);
-
     int accepted = 0; // number of accepted energy states
+    int start_after = 10000; // start energy sampling after this number of cycles
     for (int cycles=1; cycles<=MCcycles; cycles++) {
         Metropolis(S, E, M, w, L, idum, accepted);
         // update expectation values
         average[0] += E;    average[1] += E*E;
         average[2] += M;    average[3] += M*M;  average[4] += fabs(M);
 
-        double Evariance = (average[1]/cycles - average[0]*average[0]/cycles/cycles)/L/L;
         outfile << setw(15) << setprecision(8) << cycles;
-        outfile << setw(15) << setprecision(8) << Evariance;
-        if (Evariance <= sigma_E_crit) outfile << setw(15) << setprecision(8) << calc_total_energy(S, L) << endl;
-        if (Evariance > sigma_E_crit) outfile << setw(15) << setprecision(8) << "NA" << endl;
+        if (cycles > start_after) outfile << setw(15) << setprecision(8) << calc_total_energy(S, L) << endl;
     }
+    double Evariance = (average[1]/MCcycles - average[0]*average[0]/MCcycles/MCcycles)/L/L;
+    cout << "Variance = " << Evariance << endl;
     outfile.close();
 
     delete[] S;

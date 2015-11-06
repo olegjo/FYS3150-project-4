@@ -73,12 +73,6 @@ void initialize(int **S, double &E, double &M, int L, long &idum, string initial
         }
     }
 
-    for (int y = 0; y < L; y++) {
-        for (int x = 0; x < L; x++) {
-            E -= (double) S[y][x]*
-                    (S[periodic(y,L,-1)][x] +
-                    S[y][periodic(x, L, -1)]);
-        }
-    }
+    calc_total_energy(S, L);
 
 }

@@ -56,36 +56,12 @@ int main(int argc, char* argv[])
 
 
     double increment = (MCcycles_max - MCcycles_min)/((double) N);
+    if (increment == 0) increment = 1;
     for (double MCcycles = MCcycles_min; MCcycles <= MCcycles_max; MCcycles += increment) {
         start_this = clock();
         for (int i = 0; i < 5; i++) average[i] = 0.0;
         // initializing the lattice with random or uniform spin configuration
-        E = M = 0.0;
-        if (initial_state == "Random") {
-            for (int i = 0; i < L; i++) {
-                for (int j = 0; j < L; j++) {
-                    S[i][j] = round(ran1(&idum))*2 - 1;
-                    M += (double) S[i][j];
-                }
-            }
-        }
-        if (initial_state == "Uniform") {
-            for (int i = 0; i < L; i++) {
-                for (int j = 0; j < L; j++) {
-                    S[i][j] = 1;
-                    M += (double) S[i][j];
-                }
-            }
-        }
-
-        for (int y = 0; y < L; y++) {
-            for (int x = 0; x < L; x++) {
-                E -= (double) S[y][x]*
-                        (S[periodic(y,L,-1)][x] +
-                        S[y][periodic(x, L, -1)]);
-            }
-        }
-
+        initialize(S, E, M, L, idum, initial_state);
 
         int accepted = 0; // number of accepted energy states
         for (int cycles=1; cycles<=MCcycles; cycles++) {
