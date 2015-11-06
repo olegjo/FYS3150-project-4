@@ -47,6 +47,7 @@ int main(int argc, char* argv[])
     for (int i=0; i<L; i++) {
         S[i] = new int [L];
     }
+    initialize(S, E, M, L, idum, initial_state);
 
 
     ofstream outfile;
@@ -58,23 +59,6 @@ int main(int argc, char* argv[])
 
     for (int i = 0; i < 5; i++) average[i] = 0.0;
     // initializing the lattice with random or uniform spin configuration
-    E = M = 0.0;
-    if (initial_state == "Random") {
-        for (int i = 0; i < L; i++) {
-            for (int j = 0; j < L; j++) {
-                S[i][j] = round(ran1(&idum))*2 - 1;
-                M += (double) S[i][j];
-            }
-        }
-    }
-    if (initial_state == "Uniform") {
-        for (int i = 0; i < L; i++) {
-            for (int j = 0; j < L; j++) {
-                S[i][j] = 1;
-                M += (double) S[i][j];
-            }
-        }
-    }
 
     E = calc_total_energy(S, L);
 

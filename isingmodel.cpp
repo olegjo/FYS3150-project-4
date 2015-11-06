@@ -10,10 +10,6 @@ int periodic(int index, int size, int add)
     return (index + size + add) % size;
 }
 
-int randint(int a, int b, long &idum)
-{
-    return floor(ran0(&idum)*(b+1-a) + a);
-}
 
 void Metropolis(int **S, double &E, double &M, double *w, int L, long &idum, int &accepted)
 {
@@ -42,24 +38,6 @@ void Metropolis(int **S, double &E, double &M, double *w, int L, long &idum, int
 
 
 
-void Initialize_uniform(double **S, double &E, double &M, int L)
-{
-    E = M = 0.0;
-    for (int i = 0; i < L; i++) {
-        for (int j = 0; j < L; j++) {
-            S[i][j] = 1;
-            M += (double) S[i][j];
-        }
-    }
-    for (int y = 0; y < L; y++) {
-        for (int x = 0; x < L; x++) {
-            E -= (double) S[y][x]*
-                    (S[periodic(y,L,-1)][x] +
-                    S[y][periodic(x, L, -1)]);
-        }
-    }
-}
-
 double calc_total_energy(int **S, int L)
 {
     double E = 0;
@@ -71,4 +49,36 @@ double calc_total_energy(int **S, int L)
         }
     }
     return E;
+}
+
+void initialize(int **S, double &E, double &M, int L, long &idum, string initial_state)
+{
+
+
+    E = M = 0.0;
+    if (initial_state == "Random") {
+        for (int i = 0; i < L; i++) {
+            for (int j = 0; j < L; j++) {
+                S[i][j] = round(ran1(&idum))*2 - 1;
+                M += (double) S[i][j];
+            }
+        }
+    }
+    if (initial_state == "Uniform") {
+        for (int i = 0; i < L; i++) {
+            for (int j = 0; j < L; j++) {
+                S[i][j] = 1;
+                M += (double) S[i][j];
+            }
+        }
+    }
+
+    for (int y = 0; y < L; y++) {
+        for (int x = 0; x < L; x++) {
+            E -= (double) S[y][x]*
+                    (S[periodic(y,L,-1)][x] +
+                    S[y][periodic(x, L, -1)]);
+        }
+    }
+
 }
