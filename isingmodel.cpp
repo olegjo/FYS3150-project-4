@@ -73,6 +73,6 @@ void initialize(int **S, double &E, double &M, int L, long &idum, string initial
         }
     }
 
-    calc_total_energy(S, L);
+    E = calc_total_energy(S, L);
 
 }

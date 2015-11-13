@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     if (my_rank == 0) {
         outfile.open(outfilename, ios::out);
         outfile << "# Initial state: " << initial_state << endl;
-        outfile << "# MCcycles  -  sigma_E^2  -  sigma_M^2  -  C_V  -  Xsi" << endl;
+        outfile << "# T  -  <E>  -  <|M|>  -  C_V  -  Xsi" << endl;
     }
     int n_averages = 4;
     double E, M, w[17], average[n_averages], total_average[n_averages];
@@ -74,10 +74,9 @@ int main(int argc, char* argv[])
 
     long idum = -1-my_rank; // starting point for the RNG
 
+    initialize(S, E, M, L, idum, initial_state);
     for (double T = T_initial; T <= T_final; T+=T_step) {
-
         // initializing the lattice with random or uniform spin configuration
-        initialize(S, E, M, L, idum, initial_state);
 
         // pre-calculating the possible changes in energy
 
@@ -115,8 +114,8 @@ int main(int argc, char* argv[])
         double M_abs_variance = (M_abs2_average - M_abs_average*M_abs_average)/L/L;
 
         outfile << setw(15) << setprecision(8) << T;
-        outfile << setw(15) << setprecision(8) << E_variance;
-        outfile << setw(15) << setprecision(8) << M_abs_variance;
+        outfile << setw(15) << setprecision(8) << E_average/L/L;
+        outfile << setw(15) << setprecision(8) << M_abs_average/L/L;
         outfile << setw(15) << setprecision(8) << E_variance/T/T; // Divide by T*T because heat capacity
         outfile << setw(15) << setprecision(8) << M_abs_variance/T << endl; // Divide by T because susceptibility
     }

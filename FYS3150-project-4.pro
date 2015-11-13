@@ -3,7 +3,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
     task_b \
     task_d \
-    task_e
+    task_e \
+    extra
 
 # MPI Settings
 QMAKE_CXX = mpicxx
