@@ -1,0 +1,4 @@
+# Initial state: Random
+# Lattice size: L = 2
+# MCcycles  -  T  -  <E>/particle  -  C_V  -  M/part  -  Xsi  -  <|M|>/particle  -  N_accepted
+          85400              1     -1.9962998    0.029547107    -0.22768735    0.003425263     0.99881148            648

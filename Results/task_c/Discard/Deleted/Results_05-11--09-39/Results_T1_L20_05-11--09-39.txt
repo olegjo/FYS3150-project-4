@@ -1,0 +1,2 @@
+# Contents: 
+# Columns: MCcycles  -  T  -  Eaverage/part.  -  C_V  -  M/part  -  Xsi  -  abs(M)_average/part  -  N_accepted
