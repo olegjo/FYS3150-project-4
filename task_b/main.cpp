@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
             double M2average = total_average[3]*norm;
             double Mabsaverage = total_average[4]*norm;
             // all expectation values are per spin, divide by L*L
-            double Evariance = (E2average- Eaverage*Eaverage)/L/L;
+            double Evariance = (E2average - Eaverage*Eaverage)/L/L;
             double Mvariance = (M2average - Mabsaverage*Mabsaverage)/L/L;
 
 

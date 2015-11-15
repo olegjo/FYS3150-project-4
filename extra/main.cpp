@@ -15,7 +15,7 @@ int main()
     int MCcycles = 1000;
     string initial_state = "Random";
 
-    long idum = -1; // starting point for the RNG
+    long idum = -259349; // starting point for the RNG
     double E, M;
 
     // pre-calculating the possible changes in energy

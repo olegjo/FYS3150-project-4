@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     if (my_rank == 0) {
         outfile.open(outfilename, ios::out);
         outfile << "# Initial state: " << initial_state << endl;
-        outfile << "# T  -  <E>  -  <|M|>  -  C_V  -  Xsi" << endl;
+        outfile << "# T  -  <E>  -  <|M|>  -  C_V  -  Xsi  -  accepted" << endl;
     }
     int n_averages = 4;
     double E, M, w[17], average[n_averages], total_average[n_averages];
@@ -117,7 +117,10 @@ int main(int argc, char* argv[])
         outfile << setw(15) << setprecision(8) << E_average/L/L;
         outfile << setw(15) << setprecision(8) << M_abs_average/L/L;
         outfile << setw(15) << setprecision(8) << E_variance/T/T; // Divide by T*T because heat capacity
-        outfile << setw(15) << setprecision(8) << M_abs_variance/T << endl; // Divide by T because susceptibility
+        outfile << setw(15) << setprecision(8) << M_abs_variance/T; // Divide by T because susceptibility
+        outfile << setw(15) << setprecision(8) << accepted/((double) MCcycles) << endl;
+
+        if (my_rank == 0) cout << "Finished " << T << " of " << T_final << endl;
     }
     time_end = MPI_Wtime();
     total_time = time_end-time_start;
