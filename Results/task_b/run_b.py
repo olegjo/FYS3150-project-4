@@ -17,7 +17,7 @@ def mathrm(s):
 
 
 # path is the path to executable
-path = '../../build-FYS3150-project-4-OpenMPI-Release/task_b/'
+path = '../../../build-FYS3150-project-4-OpenMPI-Release/task_b/'
 
 T_start = 1
 T_stop = 1

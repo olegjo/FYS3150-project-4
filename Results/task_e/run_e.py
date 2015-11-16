@@ -25,7 +25,7 @@ def mathrm(s):
 		ret += '$\mathrm{%s}$ ' % word
 	return ret
 
-path = '../../build-FYS3150-project-4-OpenMPI-Release/task_e/'
+path = '../../../build-FYS3150-project-4-OpenMPI-Release/task_e/'
 
 T_start = 2.0
 T_stop = 2.4

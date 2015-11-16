@@ -23,7 +23,7 @@ def mathrm(s):
 	for word in s:
 		ret += '$\mathrm{%s}$ ' % word
 	return ret
-path = '../../build-FYS3150-project-4-OpenMPI-Release/task_d/'
+path = '../../../build-FYS3150-project-4-OpenMPI-Release/task_d/'
 
 L = 20
 MCcycles = 5000

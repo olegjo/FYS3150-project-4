@@ -81,7 +81,9 @@ Candidate number 16 \\
 \begin{abstract}
 
 \noindent
-In this project, I have employed the Metropolis algorithm to solve the two dimensional Ising model. First, I look at a small system and solve this analytically before I implement the algorithm and solve it numerically. 
+In this project, I have employed the Metropolis algorithm to solve the two dimensional Ising model. First, I look at a small system and solve this analytically before I implement the algorithm and solve it numerically. I then use this to approximate the critical temperature of phase transition of the lattice.
+
+I also make a note on an interesting result which may be the manifestation on the ferromagnetic Weiss domains we can observe in nature. 
 
 \end{abstract}
 
@@ -96,7 +98,7 @@ In this project, I have employed the Metropolis algorithm to solve the two dimen
 	
 
 	
-	All source code can be found at my github\footnote{\url{https://github.com/olegjo/FYS3150-project-3}}.
+	All source code can be found at my github\footnote{\url{https://github.com/olegjo/FYS3150-project-4}}.
 
 \section{Theory/Methods}
 	In its simplest form, the total energy of the Ising model can be expressed as

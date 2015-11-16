@@ -24,7 +24,7 @@ def doit():
 		os.system(run)
 
 
-path = '../../build-FYS3150-project-4-OpenMPI-Release/task_d/'
+path = '../../../build-FYS3150-project-4-OpenMPI-Release/task_d/'
 
 L = 20
 MCcycles = 100000
